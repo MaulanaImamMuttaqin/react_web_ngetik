@@ -10,16 +10,15 @@ function TypingField() {
         wordTyped: []
     })
 
-    const inputRef = useRef()
-    // let HLref = useRef(typingState.HLword.split("").map(() => createRef()))
-
+    const wordRef = useRef(words.map(w => {
+        createRef()
+    }))
 
     const spacePressed = useKeyPress(" ")
-    // const alfanumPressed = useKeyPress("abcdefghijklmnopqrstuvwxyz1234567890")
-
-
+    const inputRef = useRef()
     useEffect(() => {
-
+        console.log(words.length)
+        console.log(wordRef.current)
         if (spacePressed) {
             setTypingState({
                 ...typingState,
@@ -31,26 +30,13 @@ function TypingField() {
             inputRef.current.value = ""
         }
         inputRef.current.focus()
-
-        // console.log(typed)
-        // console.log(HLref.current)
-        // console.log(HLword)
-        // console.log(typingState)
     }, [spacePressed])
-
-    // useEffect(() => {
-    //     console.log(HLref.current)
-    //     // HLref.current.map((ref) => {
-    //     //     console.log(ref.current)
-    //     // })
-    // }, [typingState.wordTyped])
 
     const inputHandler = (e) => {
         let word = e.target.value.trim()
         let word_arr = word.split("")
         setTypingState({ ...typingState, wordTyped: word_arr })
-
-
+        console.log(wordRef.current[0])
         // let regexStr = `^${word}`
         // const regex = new RegExp(regexStr, "gi");
         // let result = regex.test(words[HLindex]);
@@ -66,7 +52,7 @@ function TypingField() {
                 <div className='flex flex-col font-Courier tracking-[.5em] text-gray-200 relative transition-all' style={{ top: `${typingState.wordPos}px` }}>
                     {
                         words.map((w, i) => {
-                            return <WordtoLetters key={i} index={i} word={w} HLindex={typingState.HLindex} HLref={HLref} />
+                            return <WordtoLetters ref={wordRef.current[i]} key={i} index={i} word={w} HLindex={typingState.HLIndex} />
                         })
                     }
                 </div>
@@ -76,24 +62,15 @@ function TypingField() {
     )
 }
 
-const WordtoLetters = ({ index, word, HLindex, HLref }) => {
+const WordtoLetters = ({ index, word, HLindex }) => {
     let letters = word.split("")
 
     return <div className={`transition-all text-center h-[50px] center word-${index === HLindex ? 'highlight' : 'normal'} font-semibold`}>
-        {index === HLindex ?
-            <div>
-                {letters.map((l, i) => {
-                    return <span ref={HLref.current[i]} key={i}>{l}</span>
-                })}
-            </div> :
-            <p>{word}</p>
-        }
 
-        {/* {
-            letters.map((l, index) => {
-                return <span key={index}>{l}</span>
-            })
-        } */}
+        {letters.map((l, i) => {
+            return <span key={i}>{l}</span>
+        })}
+
     </div>
 }
 

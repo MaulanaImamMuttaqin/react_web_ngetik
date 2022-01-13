@@ -10,9 +10,13 @@ function TypingField() {
         wordTyped: []
     })
     const [focused, setFocused] = useState(true)
+
+
     //refs
     const letterRef = useRef(words.map(() => createRef()))
     const inputRef = useRef()
+    const exessElContainer = useRef(words.map(() => createRef()))
+
 
     //keypress
     const spacePressed = useKeyPress(" ")
@@ -38,33 +42,45 @@ function TypingField() {
     }, [spacePressed])
 
     // on input focus state changes
-    useEffect(() => {
 
-        console.log(focused, focused ? 'input is focus' : 'input is not focus')
-    }, [focused])
 
 
 
     // Functions
     // function to manage input 
     const inputHandler = (e) => {
-        let letters = letterRef.current[typingState.HLIndex].current.childNodes
+        let element = letterRef.current[typingState.HLIndex].current
+        let letters = element.childNodes
         let word = e.target.value.trim()
         let word_arr = word.split("")
         setTypingState({ ...typingState, wordTyped: word_arr })
 
-
-        letters.forEach((l, i) => {
+        typingState.HLword.split("").forEach((l, i) => {
             if (word_arr[i] === undefined) {
-                l.style.color = "white"
+                letters[i].style.color = "white"
             } else {
-                if (l.innerText === word_arr[i]) {
-                    l.style.color = '#22b005'
+                if (letters[i].innerText === word_arr[i]) {
+                    letters[i].style.color = '#22b005'
                 } else {
-                    l.style.color = 'red'
+                    letters[i].style.color = '#eb4034'
                 }
             }
         })
+
+
+        if (word_arr.length >= typingState.HLword.length) {
+            let exessCont = exessElContainer.current[typingState.HLIndex].current
+            exessCont.innerHTML = ""
+
+            word_arr.slice(typingState.HLword.length, word_arr.length).forEach((w, i) => {
+                let newEl = document.createElement("SPAN")
+                let text = document.createTextNode(w)
+                newEl.setAttribute("style", "color: rgb(235, 64, 52);")
+                newEl.appendChild(text)
+                exessCont.appendChild(newEl)
+            })
+
+        }
     }
 
     // check Word Wrong Or Correct
@@ -72,10 +88,11 @@ function TypingField() {
         if (typed.trim() !== answer) {
             letterRef.current[typingState.HLIndex].current.style.borderBottom = "2px solid #ad070f"
 
-            console.log("wrong", `'${typed}' || ${answer}`)
-        } else {
-            console.log("correct", `'${typed}' || ${answer}`)
+            // console.log("wrong", `'${typed}' || ${answer}`)
         }
+        // else {
+        //     console.log("correct", `'${typed}' || ${answer}`)
+        // }
     }
 
     const focusInput = () => {
@@ -108,7 +125,7 @@ function TypingField() {
                                     {w.split("").map((l, i) => {
                                         return <span key={i}>{l}</span>
                                     })}
-
+                                    <span ref={exessElContainer.current[i]} id="excessive"></span>
                                 </div>
                             </div>
                         })

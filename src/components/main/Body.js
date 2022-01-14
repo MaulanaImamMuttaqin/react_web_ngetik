@@ -1,10 +1,10 @@
 import React from 'react'
-import TypingField from '../content/business/TypingField'
+import TypingField from '../content/TypingField'
+
 function Body() {
 
-
     return (
-        <div className='bg-dark-blue-gradient '>
+        <div className='bg-dark-blue'>
             <TypingField />
 
         </div>

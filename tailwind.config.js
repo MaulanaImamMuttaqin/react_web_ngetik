@@ -8,7 +8,9 @@ module.exports = {
         'Courier': ['Courier']
       },
       colors: {
-        'dark-blue-gradient': "#020817"
+        'dark-blue-gradient': "#020817",
+        'dark-blue': '#04000f',
+        'gold': '#FFD700'
       }
     },
   },

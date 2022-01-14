@@ -1,26 +1,26 @@
-import React, { createContext, useState, useEffect } from 'react'
-import TypingFieldContainer from './view'
-import fetchWords from './model/fetchWords'
-import words from '../../../constant/words'
+import React, { createContext, useState, useEffect, useContext } from 'react'
 import axios from 'axios'
+import TypingFieldContainer from './view'
+import fetchWords from './model/FetchWords'
+import { GlobalContext } from '../../../context/Provider'
 
 export const TypingContext = createContext()
 
 function TypingField() {
-    const [wordList, setWordList] = useState([])
+    const {
+        wordsDispatch
+    } = useContext(GlobalContext)
 
     useEffect(() => {
-        fetchWords('http://127.0.0.1:5000/').then(res => { setWordList(res) })
+
+        fetchWords('http://127.0.0.1:5000/').then(res => { wordsDispatch({ type: 'WORDS', payload: res }) })
     }, [])
 
+
     return (
-        <TypingContext.Provider
-            value={wordList}
-        >
 
-            <TypingFieldContainer />
+        <TypingFieldContainer />
 
-        </TypingContext.Provider>
     )
 }
 

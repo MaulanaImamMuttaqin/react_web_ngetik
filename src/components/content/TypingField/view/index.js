@@ -22,15 +22,10 @@ function TypingFieldContainer() {
             clearInterval(timerInterval)
 
         }
-        // console.log(showPerformance)
         return () => clearInterval(timerInterval)
     }, [typingStarted, timer])
 
 
-    // const buttonHandler = () => {
-    //     setTypingStart(true)
-    //     setTimer(5)
-    // }
 
 
     const onTypingStarted = () => {

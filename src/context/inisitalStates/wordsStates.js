@@ -1,6 +1,6 @@
 let wordStates = {
     loading: false,
-    words: {},
+    words: [],
     error: null
 }
 export default wordStates

@@ -1,9 +1,9 @@
 import axios from "axios"
 
-const fetchWords = (url) => {
+const FetchWords = (url) => {
     return axios(url).
         then(res => res.data.words)
         .catch(err => { throw err })
 }
 
-export default fetchWords
+export default FetchWords

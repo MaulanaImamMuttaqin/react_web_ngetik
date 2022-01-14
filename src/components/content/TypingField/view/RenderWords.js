@@ -30,8 +30,6 @@ function RenderWords({ timer, onTypingStarted, typingStarted }) {
                 HLIndex: typingState.HLIndex + 1,
             })
             checkTypedWord(typingState.wordTyped.join(""), words[typingState.HLIndex])
-
-            // checkTypedWord(typingState)
             inputRef.current.value = ""
 
         }

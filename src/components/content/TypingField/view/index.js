@@ -1,10 +1,18 @@
-import React, { useRef, useState, useEffect } from 'react'
+import React, { useRef, useState, useEffect, useContext } from 'react'
+import { GlobalContext } from '../../../../context/Provider'
 import RenderPerformanceLog from './RenderPerformanceLog'
 import RenderWords from './RenderWords'
 
 function TypingFieldContainer() {
+    const {
+        typingFieldState: {
+            typingStarted
+        },
+        typingDispatch,
+    } = useContext(GlobalContext)
+
     const duration = 60
-    const [typingStarted, setTypingStart] = useState(false)
+
     const [timer, setTimer] = useState(duration);
     const [showPerformance, setShowPerformance] = useState(false)
 
@@ -17,7 +25,7 @@ function TypingFieldContainer() {
             }, 1000)
         } else if (timer === 0) {
             setShowPerformance(true)
-            setTypingStart(false)
+            typingDispatch({ type: 'STOP' })
             console.log("stop")
             clearInterval(timerInterval)
 
@@ -26,17 +34,10 @@ function TypingFieldContainer() {
     }, [typingStarted, timer])
 
 
-
-
-    const onTypingStarted = () => {
-
-        setTypingStart(true)
-    }
-
     return (
         <div className="h-screen center flex-col">
             <div className='gap-10 center'>
-                <RenderWords timer={timer} onTypingStarted={() => onTypingStarted()} typingStarted={typingStarted} />
+                <RenderWords timer={timer} />
                 {showPerformance && <RenderPerformanceLog />}
             </div>
         </div>

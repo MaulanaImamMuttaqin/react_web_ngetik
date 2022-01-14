@@ -2,17 +2,25 @@ import React, { useEffect, useRef, useState, createRef, useContext } from 'react
 import { GlobalContext } from '../../../../context/Provider'
 // import words from '../../../constant/words'
 
-function RenderWords({ timer, onTypingStarted, typingStarted }) {
+function RenderWords({ timer }) {
     const {
         typingFieldState: {
             wordPos,
             HLIndex,
-            wordTyped
+            wordTyped,
+            typingStarted
         },
-        typingDispatch,
         wordsState: {
             words
-        }
+        },
+        performance: {
+            wordCount,
+            wordWrong,
+            wordCorrect
+        },
+        typingDispatch,
+        performanceDispatch
+
     } = useContext(GlobalContext)
 
 
@@ -25,14 +33,16 @@ function RenderWords({ timer, onTypingStarted, typingStarted }) {
 
     //keypress
     const spacePressed = useKeyPress(" ")
-
     //Effects Hooks
     // on space bar pressed
+
     useEffect(() => {
         if (spacePressed) {
-            typingDispatch({ type: "SPACED", payload: '' })
+            console.log(wordCount, wordCorrect, wordWrong)
+            typingDispatch({ type: "SPACED" })
             checkTypedWord(wordTyped, words[HLIndex])
             inputRef.current.value = ""
+
         }
         inputRef.current.focus()
     }, [spacePressed])
@@ -50,7 +60,7 @@ function RenderWords({ timer, onTypingStarted, typingStarted }) {
     // Functions
     // function to manage input 
     const inputHandler = (e) => {
-        onTypingStarted()
+        typingDispatch({ type: 'START' })
         let element = letterRef.current[HLIndex]
         let letters = element.childNodes
         let word = e.target.value.trim()
@@ -90,7 +100,9 @@ function RenderWords({ timer, onTypingStarted, typingStarted }) {
     const checkTypedWord = (typed, answer) => {
         if (typed.trim() !== answer) {
             letterRef.current[HLIndex].style.borderBottom = "2px solid #ad070f"
-
+            performanceDispatch({ type: "INCORRECT" })
+        } else {
+            performanceDispatch({ type: "CORRECT" })
         }
 
     }
@@ -98,6 +110,7 @@ function RenderWords({ timer, onTypingStarted, typingStarted }) {
     const focusInput = () => {
         if (!focused) {
             inputRef.current.focus()
+
         }
 
     }
@@ -111,7 +124,7 @@ function RenderWords({ timer, onTypingStarted, typingStarted }) {
 
     return (
         <div className=''>
-            <div className="text-white font-semibold tracking-[.1em] text-xl border-b border-white text-blue-500">{timer}</div>
+            <div className="text-white font-semibold tracking-[.1em] text-xl border-b border-white text-blue-500 flex justify-between px-5"><span>{timer} </span> <span>&#8634;</span></div>
             {/* {
                 !focused && <div className="h-screen w-screen center fixed top-0 left-0 z-2 border border-black" onClick={focusInput}>
                     <p className='text-2xl font-semibold text-gray-50'>clicked anywhere to continue typing</p>
@@ -143,7 +156,7 @@ function RenderWords({ timer, onTypingStarted, typingStarted }) {
 
 
 
-const useKeyPress = targetKey => {
+const useKeyPress = (targetKey) => {
     const [keyPressed, setKeyPressed] = useState(false);
 
     const downHandler = ({ key }) => {
@@ -154,7 +167,9 @@ const useKeyPress = targetKey => {
         if (targetKey.includes(key)) setKeyPressed(false);
     };
 
+
     useEffect(() => {
+
         window.addEventListener('keydown', downHandler);
         window.addEventListener('keyup', upHandler);
 
@@ -165,6 +180,7 @@ const useKeyPress = targetKey => {
     }, []);
 
     return keyPressed;
+
 };
 
 export default RenderWords

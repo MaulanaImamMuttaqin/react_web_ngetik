@@ -11,6 +11,16 @@ const typingField = (state, { type, payload }) => {
                 ...state,
                 wordTyped: payload
             }
+        case "START":
+            return {
+                ...state,
+                typingStarted: true
+            }
+        case "STOP":
+            return {
+                ...state,
+                typingStarted: false
+            }
         default:
             return state;
     }

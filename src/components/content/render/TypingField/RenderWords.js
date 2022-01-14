@@ -1,7 +1,9 @@
-import React, { useEffect, useRef, useState, createRef } from 'react'
-import words from '../../constant/words'
+import React, { useEffect, useRef, useState, createRef, useContext } from 'react'
+import { TypingContext } from '../../business/TypingField'
+// import words from '../../../constant/words'
 
-function TypingField() {
+function RenderWords({ timer }) {
+    const words = useContext(TypingContext)
     // states
     const [typingState, setTypingState] = useState({
         wordPos: 150,
@@ -110,13 +112,15 @@ function TypingField() {
 
 
     return (
-        <div className='h-screen center bg-dark-blue-gradient flex-col relative'>
-            {
-                !focused && <div className="h-screen w-screen center absolute z-2 " onClick={focusInput}>
+        <div className='border border-white'>
+            <div className="text-white font-semibold tracking-[.1em] text-xl">{timer}</div>
+            {/* {
+                !focused && <div className="h-screen w-screen center fixed top-0 left-0 z-2 border border-black" onClick={focusInput}>
                     <p className='text-2xl font-semibold text-gray-50'>clicked anywhere to continue typing</p>
                 </div>
-            }
-            <div className={`h-[350px] w-[400px] overflow-hidden relative -z-1 ${!focused && 'blur-sm'}`}>
+            } */}
+            {/* <div className={` h-[350px] w-[400px] overflow-hidden relative -z-1 ${!focused && 'blur-sm'}`}> */}
+            <div className={` h-[350px] w-[400px] overflow-hidden relative`}>
                 <div className='flex flex-col font-Courier tracking-[.5em] text-gray-200 relative transition-all' style={{ top: `${typingState.wordPos}px` }}>
                     {
                         words.map((w, i) => {
@@ -165,4 +169,4 @@ const useKeyPress = targetKey => {
     return keyPressed;
 };
 
-export default TypingField
+export default RenderWords

@@ -5,7 +5,9 @@
   font-family: 'Courier';
   src: local('Courier') url(./assets/fonts/Courier-PS-Regular.ttf) format('ttf');
 }
-
+body{
+  font-family: 'Courier'
+}
 .center {
     @apply flex justify-center items-center;
   }

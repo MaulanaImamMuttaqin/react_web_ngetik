@@ -1,21 +1,60 @@
-import React, { createContext, useState, useEffect, useContext } from 'react'
+import React, { createContext, useEffect, useContext } from 'react'
 import axios from 'axios'
 import TypingFieldContainer from './view'
-// import fetchWords from './model/fetchWords'
-import useFetchData from './model/useFetchData'
+import { BASE_URL } from '../../../constant/constants'
 import { GlobalContext } from '../../../context/Provider'
 
 export const TypingContext = createContext()
 
 function TypingField() {
-    const { wordsDispatch } = useContext(GlobalContext)
+    const {
+        performance: {
+            wordCount,
+            wordWrong,
+            wordCorrect,
+            upload
+        },
+        wordsState: {
+            update
+        },
+        performanceDispatch,
+        wordsDispatch
+    } = useContext(GlobalContext)
 
-    const fetchWords = useFetchData('http://127.0.0.1:5000/')
 
     useEffect(() => {
-        fetchWords.then(res => { wordsDispatch({ type: 'WORDS', payload: res }) })
-    }, [])
+        // fetching Words
+        console.log("fethcing")
+        wordsDispatch({ type: "FETCHING" })
+        axios(BASE_URL)
+            .then(res => {
+                wordsDispatch({
+                    type: 'WORDS',
+                    payload: res.data.words
+                })
+            })
+            .catch(err => {
+                throw err
+            })
 
+    }, [update])
+
+    useEffect(() => {
+        if (upload) {
+            axios.post(`${BASE_URL}/upload`, {
+                wordCount,
+                wordWrong,
+                wordCorrect
+            })
+                .then(res => {
+                    performanceDispatch({ type: 'STOP_UPLOAD' })
+                    console.log(res.data)
+                })
+                .catch(err => {
+                    throw console.log(err)
+                })
+        }
+    }, [upload])
 
     return (
 

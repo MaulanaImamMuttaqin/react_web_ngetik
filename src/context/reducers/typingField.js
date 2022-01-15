@@ -19,7 +19,34 @@ const typingField = (state, { type, payload }) => {
         case "STOP":
             return {
                 ...state,
-                typingStarted: false
+                typingStarted: false,
+            }
+        case "FOCUS":
+            return {
+                ...state,
+                inputIsFocus: true,
+                isPaused: false
+            }
+        case "UNFOCUS":
+            return {
+                ...state,
+                inputIsFocus: false,
+                isPaused: true
+            }
+        case "DECREASE_TIME":
+            return {
+                ...state,
+                timer: state.timer - 1
+            }
+        case "RESET":
+            return {
+                wordPos: 150,
+                HLIndex: 0,
+                wordTyped: '',
+                typingStarted: false,
+                inputIsFocus: true,
+                timer: 60,
+                isPaused: false
             }
         default:
             return state;

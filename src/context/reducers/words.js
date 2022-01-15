@@ -16,6 +16,11 @@ const words = (state, { type, payload }) => {
                 ...state,
                 error: true
             }
+        case "UPDATE":
+            return {
+                ...state,
+                update: !state.update
+            }
         default:
             return state;
     }

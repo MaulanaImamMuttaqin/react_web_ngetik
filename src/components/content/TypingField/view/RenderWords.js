@@ -1,30 +1,32 @@
 import React, { useEffect, useRef, useState, createRef, useContext } from 'react'
 import { GlobalContext } from '../../../../context/Provider'
+import InputFocusCover from './InputFocusCover'
+import useKeyPress from '../../../../customHooks/useKeyPress'
+import { ChevronRight, Restart } from '../../../reusables/Logo'
 // import words from '../../../constant/words'
 
-function RenderWords({ timer }) {
+function RenderWords() {
     const {
         typingFieldState: {
             wordPos,
             HLIndex,
             wordTyped,
-            typingStarted
+            typingStarted,
+            inputIsFocus,
+            timer
         },
         wordsState: {
-            words
+            words,
+            loading
         },
-        performance: {
-            wordCount,
-            wordWrong,
-            wordCorrect
-        },
+
         typingDispatch,
-        performanceDispatch
+        performanceDispatch,
+        wordsDispatch
 
     } = useContext(GlobalContext)
 
 
-    const [focused, setFocused] = useState(true)
 
     //refs
     const letterRef = useRef([])
@@ -32,29 +34,37 @@ function RenderWords({ timer }) {
     const exessElContainer = useRef([])
 
     //keypress
-    const spacePressed = useKeyPress(" ")
+    const spacePressed = useKeyPress(" ", "key")
+    const mousePressed = useKeyPress("mouse", "mouse")
     //Effects Hooks
     // on space bar pressed
 
     useEffect(() => {
-        if (spacePressed) {
-            console.log(wordCount, wordCorrect, wordWrong)
+        if (spacePressed && timer !== 0 && inputIsFocus) {
+
             typingDispatch({ type: "SPACED" })
             checkTypedWord(wordTyped, words[HLIndex])
             inputRef.current.value = ""
-
         }
-        inputRef.current.focus()
     }, [spacePressed])
+
+    useEffect(() => {
+        if (mousePressed && !inputIsFocus) {
+            inputRef.current.focus()
+        }
+    }, [mousePressed])
 
     useEffect(() => {
         if (typingStarted && timer === 0) {
             inputRef.current.blur()
         }
+
     }, [typingStarted])
 
+    useEffect(() => {
+        inputRef.current.focus()
+    }, [])
 
-    // on input focus state changes
 
 
     // Functions
@@ -102,53 +112,86 @@ function RenderWords({ timer }) {
             letterRef.current[HLIndex].style.borderBottom = "2px solid #ad070f"
             performanceDispatch({ type: "INCORRECT" })
         } else {
+            letterRef.current[HLIndex].style.borderBottom = "none"
             performanceDispatch({ type: "CORRECT" })
         }
 
     }
 
-    const focusInput = () => {
-        if (!focused) {
-            inputRef.current.focus()
+    const restart = (new_test) => {
+        if (new_test) {
+            wordsDispatch({ type: "UPDATE" })
+        }
+        restart_letter_styles(HLIndex)
+        inputRef.current.value = ""
+        inputRef.current.focus()
+        typingDispatch({ type: "RESET" })
+        performanceDispatch({ type: "RESET" })
 
+    }
+
+    const restart_letter_styles = (index) => {
+        for (let a = 0; a <= index; a++) {
+            letterRef.current[a].childNodes.forEach((l, i) => {
+                l.style.color = "white"
+            })
         }
 
     }
 
     // functions to manage when input is not focus and not
-    const onFocus = () => setFocused(true)
-    const onBlur = () => setFocused(false)
+    const onFocus = () => typingDispatch({ type: 'FOCUS' })
+    const onBlur = () => typingDispatch({ type: 'UNFOCUS' })
 
 
 
 
     return (
         <div className=''>
-            <div className="text-white font-semibold tracking-[.1em] text-xl border-b border-white text-blue-500 flex justify-between px-5"><span>{timer} </span> <span>&#8634;</span></div>
-            {/* {
-                !focused && <div className="h-screen w-screen center fixed top-0 left-0 z-2 border border-black" onClick={focusInput}>
-                    <p className='text-2xl font-semibold text-gray-50'>clicked anywhere to continue typing</p>
+            {/* render component ini kalau inputnya sudah gak focus lagi trus componentnya kalau di tekan bisa memfocuskan inputannya lagi */}
+            {(!inputIsFocus && timer !== 0) && <InputFocusCover />}
+
+            <div className={`${(!inputIsFocus && timer !== 0) && 'blur-md'}`}>
+                <div className="text-white font-semibold tracking-[.1em] text-xl border-b border-white text-blue-500 flex justify-between px-5 mb-5">
+                    <span>{timer}</span>
+                    <span onClick={() => restart()}> <Restart /></span>
                 </div>
-            } */}
-            {/* <div className={` h-[350px] w-[400px] overflow-hidden relative -z-1 ${!focused && 'blur-sm'}`}> */}
-            <div className={` h-[350px] w-[400px] overflow-hidden relative`}>
-                <div className='flex flex-col font-Courier tracking-[.5em] text-gray-200 relative transition-all' style={{ top: `${wordPos}px` }}>
+                <div className='relative h-[350px] w-[400px]'>
+                    {(timer === 0 && !typingStarted) &&
+                        <div className="absolute h-full w-full center z-10 flex gap-5">
+                            <button className="bg-blue-500 text-white  h-[50px] w-[70px] center rounded-full text-4xl font-bold transition hover:bg-blue-700" onClick={() => restart(false)}><Restart /></button>
+                            <button className="bg-blue-500 text-white  h-[50px] w-[70px] center rounded-full text-4xl font-bold transition hover:bg-blue-700" onClick={() => restart(true)}><ChevronRight /></button>
+                        </div>}
                     {
-                        words.map((w, i) => {
-                            return <div key={i} className={`transition-all text-center h-[50px] center word-${i === HLIndex ? 'highlight' : 'normal'} font-semibold`}>
-                                <div ref={(el) => (letterRef.current[i] = el)} className="">
-                                    {w.split("").map((l, i) => {
-                                        return <span key={i}>{l}</span>
-                                    })}
-                                    <span ref={(el) => exessElContainer.current[i] = el} id="excessive"></span>
+                        !loading ?
+
+                            <div className={` h-full w-full overflow-hidden ${timer === 0 && 'blur-md'} `}>
+                                <div className='flex flex-col  tracking-[.5em] text-gray-200  transition-all ' style={{ transform: `translateY(${wordPos}px` }}>
+                                    {
+                                        words.map((w, i) => {
+                                            return <div key={i} className={`transition-all text-center  h-[50px] center word-${i === HLIndex ? 'highlight' : 'normal'} font-semibold`}>
+                                                <div ref={(el) => (letterRef.current[i] = el)} className="">
+                                                    {w.split("").map((l, i) => {
+                                                        return <span key={i}>{l}</span>
+                                                    })}
+                                                    <span ref={(el) => exessElContainer.current[i] = el} id="excessive"></span>
+                                                </div>
+                                            </div>
+                                        })
+
+                                    }
                                 </div>
                             </div>
-                        })
 
+                            : <div className="h-full w-full center text-white text-3xl">
+                                <p>Loading...</p>
+                            </div>
                     }
+
                 </div>
+
+                <input className='block h-0' type="text" ref={inputRef} onChange={e => inputHandler(e)} onFocus={onFocus} onBlur={onBlur} />
             </div>
-            <input className='block h-0' type="text" ref={inputRef} onChange={e => inputHandler(e)} onFocus={onFocus} onBlur={onBlur} />
 
         </div >
     )
@@ -156,31 +199,7 @@ function RenderWords({ timer }) {
 
 
 
-const useKeyPress = (targetKey) => {
-    const [keyPressed, setKeyPressed] = useState(false);
-
-    const downHandler = ({ key }) => {
-        if (targetKey.includes(key)) setKeyPressed(true);
-    };
-
-    const upHandler = ({ key }) => {
-        if (targetKey.includes(key)) setKeyPressed(false);
-    };
 
 
-    useEffect(() => {
-
-        window.addEventListener('keydown', downHandler);
-        window.addEventListener('keyup', upHandler);
-
-        return () => {
-            window.removeEventListener('keydown', downHandler);
-            window.removeEventListener('keyup', upHandler);
-        };
-    }, []);
-
-    return keyPressed;
-
-};
 
 export default RenderWords

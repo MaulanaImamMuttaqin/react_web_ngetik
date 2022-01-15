@@ -4,6 +4,8 @@ let typingPerformanceStates = {
     wordWrong: 0,
     wordCorrect: 0,
     speed: 0,
+    showPerformance: false,
+    upload: false
 
 }
 

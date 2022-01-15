@@ -152,7 +152,7 @@ function RenderWords() {
             {(!inputIsFocus && timer !== 0) && <InputFocusCover />}
 
             <div className={`${(!inputIsFocus && timer !== 0) && 'blur-md'}`}>
-                <div className="text-white font-semibold tracking-[.1em] text-xl border-b border-white text-blue-500 flex justify-between px-5 mb-5">
+                <div className=" font-semibold tracking-[.1em] text-xl border-b border-white text-blue-500 flex justify-between px-5 mb-5">
                     <span>{timer}</span>
                     <span onClick={() => restart()}> <Restart /></span>
                 </div>

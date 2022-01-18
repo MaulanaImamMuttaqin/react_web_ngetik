@@ -1,3 +1,5 @@
+import typingFieldStates from "../inisitalStates/typingFieldStates"
+
 const typingField = (state, { type, payload }) => {
     switch (type) {
         case "SPACED":
@@ -40,13 +42,7 @@ const typingField = (state, { type, payload }) => {
             }
         case "RESET":
             return {
-                wordPos: 150,
-                HLIndex: 0,
-                wordTyped: '',
-                typingStarted: false,
-                inputIsFocus: true,
-                timer: 60,
-                isPaused: false
+                ...typingFieldStates
             }
         default:
             return state;

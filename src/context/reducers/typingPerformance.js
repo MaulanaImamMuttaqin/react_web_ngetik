@@ -1,16 +1,30 @@
+import typingPerformanceStates from "../inisitalStates/typingPerformanceStates"
 const typingPerformance = (state, { type, payload }) => {
     switch (type) {
         case "CORRECT":
             return {
                 ...state,
                 wordCorrect: state.wordCorrect + 1,
-                wordCount: state.wordCount + 1
+                wordCount: state.wordCount + 1,
+                charWrong: state.charWrong + payload
             }
         case "INCORRECT":
             return {
                 ...state,
                 wordWrong: state.wordWrong + 1,
-                wordCount: state.wordCount + 1
+                wordCount: state.wordCount + 1,
+                charWrong: state.charWrong + payload
+            }
+        case "CHAR":
+            return {
+                ...state,
+                charCount: state.charCount + 1,
+            }
+        case "CALCULATE":
+            return {
+                ...state,
+                speed: payload.net,
+                accuracy: payload.accuracy
             }
         case "SHOW":
             return {
@@ -19,12 +33,7 @@ const typingPerformance = (state, { type, payload }) => {
             }
         case "RESET":
             return {
-                charCount: 0,
-                wordCount: 0,
-                wordWrong: 0,
-                wordCorrect: 0,
-                speed: 0,
-                showPerformance: false
+                ...typingPerformanceStates
             }
         case "UPLOAD":
             return {

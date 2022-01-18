@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react'
 
-const useKeyPress = (targetKey, event) => {
+const useKeyPress = (targetKey, event, reference) => {
     const [keyPressed, setKeyPressed] = useState(false);
 
     const downHandler = ({ key }) => {
@@ -21,12 +21,12 @@ const useKeyPress = (targetKey, event) => {
 
     useEffect(() => {
 
-        window.addEventListener(`${event}down`, downHandler);
-        window.addEventListener(`${event}up`, upHandler);
+        reference.addEventListener(`${event}down`, downHandler);
+        reference.addEventListener(`${event}up`, upHandler);
 
         return () => {
-            window.removeEventListener(`${event}down`, downHandler);
-            window.removeEventListener(`${event}up`, upHandler);
+            reference.removeEventListener(`${event}down`, downHandler);
+            reference.removeEventListener(`${event}up`, upHandler);
         };
     }, []);
 

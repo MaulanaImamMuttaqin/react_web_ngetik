@@ -19,7 +19,9 @@ function RenderWords() {
             words,
             loading
         },
-
+        performance: {
+            charCount
+        },
         typingDispatch,
         performanceDispatch,
         wordsDispatch
@@ -32,10 +34,12 @@ function RenderWords() {
     const letterRef = useRef([])
     const inputRef = useRef()
     const exessElContainer = useRef([])
+    const focusCoverRef = useRef()
 
     //keypress
-    const spacePressed = useKeyPress(" ", "key")
-    const mousePressed = useKeyPress("mouse", "mouse")
+    const spacePressed = useKeyPress(" ", "key", window)
+    const mousePressed = useKeyPress("mouse", "mouse", window)
+    // const keyInputPressed = useKeyPress("abcdefghijklmnopqrstuvvwxyzABCDEFGHIJKLMOPQRSTUVWXYZ`1234567890~!@#$%^&*()_+", "key", inputRef.current)
     //Effects Hooks
     // on space bar pressed
 
@@ -43,6 +47,7 @@ function RenderWords() {
         if (spacePressed && timer !== 0 && inputIsFocus) {
 
             typingDispatch({ type: "SPACED" })
+            performanceDispatch({ type: "CHAR" })
             checkTypedWord(wordTyped, words[HLIndex])
             inputRef.current.value = ""
         }
@@ -63,7 +68,9 @@ function RenderWords() {
 
     useEffect(() => {
         inputRef.current.focus()
+
     }, [])
+
 
 
 
@@ -76,6 +83,10 @@ function RenderWords() {
         let word = e.target.value.trim()
         let word_arr = word.split("")
         typingDispatch({ type: "TYPED", payload: word })
+        if (word.length > wordTyped.length) {
+            performanceDispatch({ type: "CHAR" })
+        }
+
         words[HLIndex].split("").forEach((l, i) => {
             if (word_arr[i] === undefined) {
                 letters[i].style.color = "white"
@@ -104,17 +115,32 @@ function RenderWords() {
         } else {
             exessElContainer.current[HLIndex].innerHTML = ""
         }
+
+
     }
 
     // check Word Wrong Or Correct
     const checkTypedWord = (typed, answer) => {
+        let dispatchType = ""
+        let typedArr = typed.split("")
+        let answerArr = answer.split("")
+        let wrongChar = (typedArr.length > answerArr.length) ? typedArr.length - answerArr.length : 0;
+        // let looped = (typedArr.length > answerArr.length) ? typedArr : answerArr
+        answerArr.forEach((a, i) => {
+            if ((typedArr[i] === undefined) || (a !== typedArr[i])) {
+                wrongChar++
+            }
+        })
+
         if (typed.trim() !== answer) {
             letterRef.current[HLIndex].style.borderBottom = "2px solid #ad070f"
-            performanceDispatch({ type: "INCORRECT" })
+            dispatchType = "INCORRECT"
         } else {
             letterRef.current[HLIndex].style.borderBottom = "none"
-            performanceDispatch({ type: "CORRECT" })
+            dispatchType = "CORRECT"
         }
+
+        performanceDispatch({ type: dispatchType, payload: wrongChar })
 
     }
 
@@ -139,6 +165,7 @@ function RenderWords() {
 
     }
 
+
     // functions to manage when input is not focus and not
     const onFocus = () => typingDispatch({ type: 'FOCUS' })
     const onBlur = () => typingDispatch({ type: 'UNFOCUS' })
@@ -147,11 +174,11 @@ function RenderWords() {
 
 
     return (
-        <div className=''>
+        <div className='relative '>
             {/* render component ini kalau inputnya sudah gak focus lagi trus componentnya kalau di tekan bisa memfocuskan inputannya lagi */}
-            {(!inputIsFocus && timer !== 0) && <InputFocusCover />}
+            <InputFocusCover open={(!inputIsFocus && timer !== 0) ? true : false} ref={focusCoverRef} />
 
-            <div className={`${(!inputIsFocus && timer !== 0) && 'blur-md'}`}>
+            <div className={`${(!inputIsFocus && timer !== 0) && 'blur-md'} p-2 rounded-2xl shadow-2xl`}>
                 <div className=" font-semibold tracking-[.1em] text-xl border-b border-white text-blue-500 flex justify-between px-5 mb-5">
                     <span>{timer}</span>
                     <span onClick={() => restart()}> <Restart /></span>
@@ -160,7 +187,7 @@ function RenderWords() {
                     {(timer === 0 && !typingStarted) &&
                         <div className="absolute h-full w-full center z-10 flex gap-5">
                             <button className="bg-blue-500 text-white  h-[50px] w-[70px] center rounded-full text-4xl font-bold transition hover:bg-blue-700" onClick={() => restart(false)}><Restart /></button>
-                            <button className="bg-blue-500 text-white  h-[50px] w-[70px] center rounded-full text-4xl font-bold transition hover:bg-blue-700" onClick={() => restart(true)}><ChevronRight /></button>
+                            <button className="bg-blue-500 text-white  h-[50px] w-[70px] center rounded-full text-4xl font-bold transition hover:bg-blue-700" onClick={() => restart(true)}><ChevronRight size={10} /></button>
                         </div>}
                     {
                         !loading ?

@@ -24,7 +24,6 @@ function TypingField() {
 
     useEffect(() => {
         // fetching Words
-        console.log("fethcing")
         wordsDispatch({ type: "FETCHING" })
         axios(BASE_URL)
             .then(res => {
@@ -48,7 +47,6 @@ function TypingField() {
             })
                 .then(res => {
                     performanceDispatch({ type: 'STOP_UPLOAD' })
-                    console.log(res.data)
                 })
                 .catch(err => {
                     throw console.log(err)
